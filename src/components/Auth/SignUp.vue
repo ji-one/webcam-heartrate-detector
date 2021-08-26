@@ -63,8 +63,9 @@ export default {
         .post("auth/signup/", this.credentials)
         .then((res) => {
           console.log(res);
+          alert("You have signed up successfully.");
           this.$emit("close");
-          //   this.$router.push({ name: "Home" });
+          //   this.$router.push({ path: "/" });
         })
         .catch((err) => {
           alert(err.response.data.error);
