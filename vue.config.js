@@ -23,4 +23,15 @@ module.exports = {
   pages: {
     index: "src/main.js",
   },
+
+  devServer: {
+    proxy: {
+      "/": {
+        target: "http://localhost:8000",
+        pathRewrite: { "^/": "" },
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 };
