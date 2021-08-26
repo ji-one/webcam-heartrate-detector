@@ -20,13 +20,14 @@
 <script>
 import Heartbeat from "/public/static/heartbeat.js";
 export default {
+  name: "Home",
   data: () => ({}),
   mounted() {
     const BASE_URL = process.env.BASE_URL;
     const faceAPI = document.createElement("script");
     faceAPI.setAttribute("src", `${BASE_URL}/static/face-api.min.js`);
     document.head.appendChild(faceAPI);
-    
+
     const demo = new Heartbeat(
       "webcam",
       "canvas",
