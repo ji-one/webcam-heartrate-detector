@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const RESCAN_INTERVAL = 1000;
 const DEFAULT_FPS = 30;
 const LOW_BPM = 42;
@@ -389,6 +391,7 @@ export default class Heartbeat {
     return [res.data32F[0], res.data32F[1], res.data32F[2]];
   }
   // Compute rppg signal and estimate HR
+  // ANCHOR
   rppg() {
     // Update fps
     let fps = this.getFps(this.timestamps);
@@ -429,15 +432,24 @@ export default class Heartbeat {
         bandMask.delete();
         // Infer BPM
         let bpm = ((result.maxLoc.y * fps) / signal.rows) * SEC_PER_MIN;
-        console.log(bpm);
+        // console.log(bpm);
         // Draw BPM
         this.drawBPM(bpm);
+        // Save BPM
+        this.saveBPM(bpm);
       }
       signal.delete();
     } else {
       console.log("signal too small");
     }
   }
+  saveBPM(bpm) {
+    // 8080 포트에서 접근 시 CORS 에러 발생
+    axios
+      .post("http://localhost:8000/hr/", { bpm })
+      .catch((err) => console.log(err));
+  }
+
   // Calculate fps from timestamps
   getFps(timestamps, timeBase = 1000) {
     if (Array.isArray(timestamps) && timestamps.length) {

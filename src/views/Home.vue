@@ -34,7 +34,7 @@ export default {
       `${BASE_URL}/static/haarcascade_frontalface_alt.xml`,
       30,
       6,
-      250
+      1000
     );
 
     let ready = this.loadOpenCv(`${BASE_URL}/static/opencv.js`);
@@ -45,7 +45,7 @@ export default {
     async loadOpenCv(uri) {
       return new Promise(function(resolve) {
         console.log("starting to load opencv");
-        var tag = document.createElement("script");
+        let tag = document.createElement("script");
         tag.src = uri;
         tag.async = true;
         tag.type = "text/javascript";
@@ -58,7 +58,7 @@ export default {
         tag.onerror = () => {
           throw new URIError("opencv didn't load correctly.");
         };
-        var firstScriptTag = document.getElementsByTagName("script")[0];
+        let firstScriptTag = document.getElementsByTagName("script")[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       });
     },
