@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.http import HttpResponse
 from .serializers import UserSerializer
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
@@ -35,9 +36,17 @@ def signin(request):
     user = authenticate(username=username, password=password)
     if user:
         login(request, user)
+        request.session['user_id'] = user.id
         encoded_jwt = jwt.encode(
             {'username': user.username}, 'SECRET', algorithm='HS256').decode('utf-8')
         response = JsonResponse({"token": str(encoded_jwt)})
         return response
 
     return JsonResponse({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['DELETE'])
+def signout(request):
+    if request.session.get('user_id'):
+        del(request.session['user_id'])
+        return HttpResponse(status=200)
+    return HttpResponse(status=401)
