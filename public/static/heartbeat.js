@@ -444,9 +444,8 @@ export default class Heartbeat {
     }
   }
   saveBPM(bpm) {
-    // 8080 포트에서 접근 시 CORS 에러 발생
     axios
-      .post("http://localhost:8000/hr/", { bpm })
+      .post("hr/", { bpm })
       .catch((err) => console.log(err));
   }
 
