@@ -44,9 +44,10 @@ def signin(request):
 
     return JsonResponse({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
 @api_view(['DELETE'])
 def signout(request):
-    if request.session.get('user_id'):
+    if request.session['user_id']:
         del(request.session['user_id'])
         return HttpResponse(status=200)
     return HttpResponse(status=401)

@@ -67,8 +67,13 @@ export default {
   }),
   methods: {
     signout() {
-      this.$store.commit("del_token");
-      if (this.$route.path !== "/") this.$router.push({ name: "Home" });
+      this.axios
+        .delete("auth/signout/")
+        .then(() => {
+          this.$store.commit("del_token");
+          if (this.$route.path !== "/") this.$router.push({ name: "Home" });
+        })
+        .catch((e) => console.log(e));
     },
   },
 };
