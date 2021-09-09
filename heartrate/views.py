@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from heartrate.models import AverageHR, HR
 from accounts.models import User
 from django.db.models import Avg
+from django.core import serializers
 
 # Create your views here.
 
@@ -36,3 +37,16 @@ def average(self, force_insert=False, force_update=False, *args, **kwargs):
         else:
             AverageHR.objects.create(
                 hour=self.created_at.hour, user=self.user, avg_bpm=avg_bpm)
+
+
+@api_view(['GET'])
+def get_avg_bpm(request):
+    if not request.session.get('user_id'):
+        return HttpResponse(status=401)
+
+    user_id = request.session.get('user_id')
+    user = User.objects.get(pk=user_id)
+    avg_bpm_list = AverageHR.objects.filter(
+        user=user).only('hour', 'avg_bpm')
+    avg_bpm_list = serializers.serialize('json', avg_bpm_list)
+    return HttpResponse(avg_bpm_list, content_type="text/json-comment-filtered")

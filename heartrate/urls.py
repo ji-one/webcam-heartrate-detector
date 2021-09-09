@@ -7,4 +7,5 @@ app_name = 'heartrate'
 
 urlpatterns = [
     path('', views.save_bpm),
+    path('avg/', views.get_avg_bpm),
 ]

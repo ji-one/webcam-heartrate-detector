@@ -43,6 +43,10 @@
           "
         />
       </v-dialog>
+
+      <v-btn v-if="this.$store.state.login" text color="white" to="/analysis"
+        >analysis</v-btn
+      >
       <v-btn v-if="this.$store.state.login" @click="signout" text color="white"
         >sign out</v-btn
       >
