@@ -1,4 +1,4 @@
-## Initial project setup
+## Project setup
 
 1. Clone project
 
