@@ -57,6 +57,7 @@ export default {
           this.decoded = jwt.decode(sessionStorage.token);
           this.$store.commit("get_token", this.decoded);
           // this.$router.push({ name: "Home" });
+          this.getBPM();
           this.$emit("close");
         })
         .catch((err) => {
@@ -65,6 +66,18 @@ export default {
     },
     toSignUp() {
       this.$emit("toSignUp");
+    },
+    getBPM() {
+      this.axios
+        .get("hr/avg")
+        .then((res) => {
+          this.$store.state.avgBPM = Array.from({ length: 24 }, () => 0);
+          res.data.forEach((e) => {
+            this.$store.state.avgBPM[e.fields.hour] = e.fields.avg_bpm;
+          });
+          console.log(this.$store.state.avgBPM);
+        })
+        .catch((err) => console.log(err));
     },
   },
 };

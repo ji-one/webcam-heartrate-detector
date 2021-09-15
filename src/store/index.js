@@ -10,6 +10,7 @@ export default new Vuex.Store({
     login: false,
     username: "",
     token: null,
+    avgBPM: [],
   },
   mutations: {
     get_token(state, token) {

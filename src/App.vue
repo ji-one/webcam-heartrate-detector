@@ -75,6 +75,7 @@ export default {
         .delete("auth/signout/")
         .then(() => {
           this.$store.commit("del_token");
+          this.$store.state.avgBPM = [];
           if (this.$route.path !== "/") this.$router.push({ name: "Home" });
         })
         .catch((e) => console.log(e));
