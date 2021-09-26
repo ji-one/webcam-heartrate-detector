@@ -1,4 +1,5 @@
 import axios from "axios";
+import store from "../../src/store/index";
 
 const RESCAN_INTERVAL = 1000;
 const DEFAULT_FPS = 30;
@@ -30,6 +31,7 @@ export default class Heartbeat {
     this.targetFps = targetFps;
     this.windowSize = windowSize;
     this.rppgInterval = rppgInterval;
+    this.bpmRecords = [];
   }
   // Start the video stream
   async startStreaming() {
@@ -433,10 +435,16 @@ export default class Heartbeat {
         // Infer BPM
         let bpm = ((result.maxLoc.y * fps) / signal.rows) * SEC_PER_MIN;
         // console.log(bpm);
+
         // Draw BPM
         this.drawBPM(bpm);
         // Save BPM
         this.saveBPM(bpm);
+        const record = { bpm, time: new Date() };
+        this.bpmRecords.push(record);
+        console.log(this.bpmRecords, this.bpmRecords.length);
+        // Check BPM
+        this.checkBPM(record);
       }
       signal.delete();
     } else {
@@ -444,11 +452,48 @@ export default class Heartbeat {
     }
   }
   saveBPM(bpm) {
-    axios
-      .post("hr/", { bpm })
-      .catch((err) => console.log(err));
+    if (store.state.login) {
+      axios.post("hr/", { bpm }).catch((err) => console.log(err));
+    }
   }
+  checkBPM(record) {
+    const top = this.bpmRecords[0];
+    const len = this.bpmRecords.length;
+    const INTERVAL = 600000; // 10 min
+    console.log(record.time.getTime() - top.time.getTime());
+    if (record.time.getTime() - top.time.getTime() >= INTERVAL) {
+      const avgBPM = this.bpmRecords.reduce((p, c) => p + c.bpm, 0) / len;
+      const avgTime =
+        this.bpmRecords.reduce((p, c) => p + c.time.getTime(), 0) / len;
+      const hour = new Date(avgTime).getHours();
 
+      console.log(store.state.avgBPM, hour);
+      if (!store.state.avgBPM[hour]) {
+        console.log("no data");
+        return;
+      }
+
+      const lower = store.state.avgBPM[hour] * 0.9;
+      const upper = store.state.avgBPM[hour] * 1.1;
+      const start_time =
+        (record.time.getHours() >= 12 ? "오후 " : "오전 ") +
+        record.time.getHours() +
+        ":" +
+        record.time.getMinutes();
+      if (avgBPM < lower) {
+        store.commit("openAlertDialog", {
+          result: "심박수 낮음",
+          detail: `사용자의 심박수가 ${start_time}부터 10분 동안 해당 시간대의 평소 심박수 ${store.state.avgBPM[hour]}BPM보다 더 낮아졌습니다.`,
+        });
+      } else if (avgBPM > upper) {
+        store.commit("openAlertDialog", {
+          result: "심박수 높음",
+          detail: `사용자의 심박수가 ${start_time}부터 10분 동안 해당 시간대의 평소 심박수 ${store.state.avgBPM[hour]}BPM보다 더 올라갔습니다.`,
+        });
+      }
+      this.bpmRecords.splice(0, len);
+    }
+  }
   // Calculate fps from timestamps
   getFps(timestamps, timeBase = 1000) {
     if (Array.isArray(timestamps) && timestamps.length) {
