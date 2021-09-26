@@ -15,12 +15,17 @@
       <video hidden id="webcam" width="640" height="480"></video>
       <canvas id="canvas" width="640" height="480"></canvas>
     </div>
+    <alert-dialog />
   </div>
 </template>
 <script>
 import Heartbeat from "/public/static/heartbeat.js";
+import AlertDialog from "@/components/Home/AlertDialog.vue";
 export default {
   name: "Home",
+  components: {
+    AlertDialog,
+  },
   data: () => ({}),
   mounted() {
     const BASE_URL = process.env.BASE_URL;
@@ -37,7 +42,7 @@ export default {
       1000
     );
 
-    let ready = this.loadOpenCv(`${BASE_URL}/static/opencv.js`);
+    const ready = this.loadOpenCv(`${BASE_URL}/static/opencv.js`);
     ready.then(() => demo.init());
   },
 
@@ -45,7 +50,7 @@ export default {
     async loadOpenCv(uri) {
       return new Promise(function(resolve) {
         console.log("starting to load opencv");
-        let tag = document.createElement("script");
+        const tag = document.createElement("script");
         tag.src = uri;
         tag.async = true;
         tag.type = "text/javascript";
@@ -58,7 +63,7 @@ export default {
         tag.onerror = () => {
           throw new URIError("opencv didn't load correctly.");
         };
-        let firstScriptTag = document.getElementsByTagName("script")[0];
+        const firstScriptTag = document.getElementsByTagName("script")[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       });
     },

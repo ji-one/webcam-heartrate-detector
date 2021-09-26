@@ -5,12 +5,14 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  plugins: [createPersistedState()],
+  // plugins: [createPersistedState()],
   state: {
     login: false,
     username: "",
     token: null,
     avgBPM: [],
+    alertDialogToggle: false,
+    alertDialogInfo: null,
   },
   mutations: {
     get_token(state, token) {
@@ -22,7 +24,16 @@ export default new Vuex.Store({
       state.username = "";
       sessionStorage.clear();
     },
+    openAlertDialog(state, payload) {
+      state.alertDialogInfo = payload
+      state.alertDialogToggle = true
+    },
+    closeAlertDialog(state) {
+      state.alertDialogInfo = null
+      state.alertDialogToggle = false
+    },
   },
-  actions: {},
+  actions: {
+  },
   modules: {},
 });
